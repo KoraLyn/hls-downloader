@@ -49,13 +49,23 @@ export async function mergeChunks(logger: ILogger, ffmpegPath: string, segments:
     fs.unlinkSync(segmentsFile);
 }
 
-export async function transmuxTsToMp4(logger: ILogger, ffmpegPath: string, inputFile: string, outputFile: string): Promise<void> {
-    await spawnFfmpeg(logger, ffmpegPath, [
+export async function transmuxTsToMp4(logger: ILogger, ffmpegPath: string, inputFile: string, outputFile: string, metadata: { [field: string]: string }): Promise<void> {
+    var ffmpegArgs = [
         "-y",
         "-loglevel", "warning",
         "-i", inputFile,
         "-c", "copy",
-        "-bsf:a", "aac_adtstoasc",
-        outputFile,
-    ]);
+        "-bsf:a", "aac_adtstoasc"
+    ]
+
+    if (metadata) {
+        Object.entries(metadata).forEach(([field, value]) => {
+            ffmpegArgs.push("-metadata");
+            ffmpegArgs.push(`${field}="${value}"`)
+        });
+    }
+
+    ffmpegArgs.push(outputFile);
+
+    await spawnFfmpeg(logger, ffmpegPath, ffmpegArgs);
 }

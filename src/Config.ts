@@ -14,4 +14,5 @@ export interface IConfig {
     outputFile: string;
     httpHeaders?: HttpHeaders;
     logger?: ILogger | ((...params: any) => void) | null;
+    metadata: { [field: string]: string };
 }
